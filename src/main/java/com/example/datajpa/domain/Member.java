@@ -21,6 +21,7 @@ public class Member {
     private String name;
     @Embedded
     private Address address;
+    private int age;
 
     @JsonIgnore
     @OneToMany(mappedBy = "member")
@@ -28,6 +29,10 @@ public class Member {
 
     public Member(String name){
         this.name = name;
+    }
+    public Member(String name, int age){
+        this.name = name;
+        this.age = age;
     }
 
     protected Member(){

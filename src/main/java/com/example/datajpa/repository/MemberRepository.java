@@ -3,6 +3,8 @@ package com.example.datajpa.repository;
 import com.example.datajpa.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 public interface MemberRepository extends JpaRepository<Member, Long> {//첫번째 타입, 두번째 매핑된 pk
 
     /*
@@ -18,4 +20,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {//첫번�
     *
     * */
 
+    List<Member> findByNameAndAgeGreaterThan(String username, int age);
+
+    List<Member> findTop3ABy();
 }
