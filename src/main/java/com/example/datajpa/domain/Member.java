@@ -14,6 +14,10 @@ import java.util.List;
 @Table(name = "members")
 @Data
 @AllArgsConstructor
+@NamedQuery(
+        name = "Member.findByName",
+        query = "select m from Member m where m.name =: name"
+)
 public class Member {
     @Id @GeneratedValue
     @Column(name = "member_id")

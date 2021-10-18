@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.List;
 
 @Repository
 public class MemberJpaRespository {
@@ -18,5 +19,12 @@ public class MemberJpaRespository {
 
     public Member find(Long id){
         return em.find(Member.class, id);
+    }
+
+    public List<Member> findByName(String name){
+        return em.createNamedQuery("Member.findByName", Member.class)
+                .setParameter("name", name)
+                .getResultList();
+        //구현 하는게 비효율 적이다! --> 편하게 호출하는 법이 있다.
     }
 }

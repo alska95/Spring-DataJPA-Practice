@@ -16,6 +16,8 @@ class MemberRepositoryTest {
 
     @Autowired
     private MemberRepository memberRepository;
+    @Autowired
+    private MemberJpaRespository memberJpaRespository;
     @Test
     public void testMember(){
         Member member = new Member("hwang");
@@ -37,4 +39,22 @@ class MemberRepositoryTest {
 
         memberRepository.findTop3ABy();
     }
+    @Test
+    public void testNamedQueryMember(){
+        Member member = new Member("hwang" , 10);
+        memberRepository.save(member);
+        List<Member> hwang = memberJpaRespository.findByName("hwang");
+
+        Assertions.assertThat(hwang.get(0).getName()).isEqualTo("hwang");
+    }
+    @Test
+    public void testNamedQueryMember2(){
+        Member member = new Member("hwang" , 10);
+        memberRepository.save(member);
+        List<Member> hwang = memberRepository.findByName("hwang");
+
+        Assertions.assertThat(hwang.get(0).getName()).isEqualTo("hwang");
+    }
+
+
 }
