@@ -17,6 +17,7 @@ public class Order {
     @Id @GeneratedValue
     @Column(name = "order_id")
     private Long id;
+    private String name;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "member_id") //foreign key를 가지고있는 쪽을 연관관계 주인으로 설정하는것이 좋다.

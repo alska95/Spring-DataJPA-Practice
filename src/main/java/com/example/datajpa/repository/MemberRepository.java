@@ -1,6 +1,7 @@
 package com.example.datajpa.repository;
 
 import com.example.datajpa.domain.Member;
+import com.example.datajpa.dto.MemberDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -28,4 +29,13 @@ public interface MemberRepository extends JpaRepository<Member, Long> {//첫번�
 
 //    @Query(name = "Member.findByName")
     List<Member> findByName(@Param("name") String name);
+
+    @Query("select m from Member m where m.name = :name and m.age = :age")
+    List<Member> findUser(@Param("name") String name, @Param("age") int age);
+
+    @Query("select m.name from Member m")
+    List<String> findNameList();
+
+    @Query("select new com.example.datajpa.dto.MemberDto(m.id, m.name, o.name) from Member m join m.orders o")
+    List<MemberDto> findMemberDto();
 }
