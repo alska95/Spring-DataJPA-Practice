@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {//첫번째 타입, 두번째 매핑된 pk
 
@@ -38,4 +39,11 @@ public interface MemberRepository extends JpaRepository<Member, Long> {//첫번�
 
     @Query("select new com.example.datajpa.dto.MemberDto(m.id, m.name, o.name) from Member m join m.orders o")
     List<MemberDto> findMemberDto();
+
+    @Query("select m from Member m where m.name in :names")
+    List<Member> findByNames(@Param("names") List<String> names);
+
+
+    @Query("select m from Member m where m.name in :names")
+    Optional<Member> findOneByName(@Param("names") String names);
 }

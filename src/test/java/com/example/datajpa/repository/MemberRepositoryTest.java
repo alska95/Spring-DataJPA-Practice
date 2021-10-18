@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -75,5 +76,19 @@ class MemberRepositoryTest {
         }
     }
 
+    @Test
+    public void returntype(){
 
+        Member member = new Member("hwang" , 10);
+        Member member1 = new Member("hwang" , 20);
+        Member member2 = new Member("hwang" , 30);
+        memberRepository.save(member);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+//        Optional<Member> hwang20 = memberRepository.findOneByName("hwang"); NonUniqueResultException을 발생시킨다!
+//        Assertions.assertThat(hwang20.get().getName()).isEqualTo("hwang");
+
+        memberRepository.findTop3ABy();
+    }
 }
