@@ -1,6 +1,7 @@
 package com.example.datajpa.repository;
 
 import com.example.datajpa.domain.Member;
+import com.example.datajpa.domain.Team;
 import org.apache.logging.slf4j.SLF4JLogger;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 
@@ -29,6 +31,8 @@ class MemberRepositoryTest {
     private MemberRepository memberRepository;
     @Autowired
     private MemberJpaRespository memberJpaRespository;
+    @Autowired
+    private TeamRepository teamRepository;
 
     @PersistenceContext
     private EntityManager em;
@@ -152,5 +156,77 @@ class MemberRepositoryTest {
         //then
         System.out.println(i);
 
+    }
+
+    @Test
+    @Rollback
+    public void findMemberLazy(){
+        //given
+        //member1 -> teamA
+        //member2 -> teamB
+        Team teamA = new Team("teamA");
+        Team teamB = new Team("teamB");
+        teamRepository.save(teamA);
+        teamRepository.save(teamB);
+        Member member1 = new Member("hwang", 10 , teamA);
+        Member member2 = new Member("hwang2", 210 , teamB);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+        
+        em.flush();
+        em.clear();
+        
+        //when
+        List<Member> members = memberRepository.findAll();
+        for(Member member : members){
+            System.out.println("member.getName() = " + member.getName()); //1번의 쿼리 리스트 가져올때
+            System.out.println("member.getTeam().getClass() = " + member.getTeam().getClass()); //프록시 가져옴(fetch = FetchType.lazy 이기 때문에
+            System.out.println("member.getTeam().getName() = " + member.getTeam().getName()); //n번의 쿼리
+            //팀을 가져오고 걔의 요소에 접근 할 때, 쿼리를 다시 돌려서 가져와야 됨.
+            //n+1은 lazy로 바꾼다고 해결되는게 아니라, 잠시 미룰 뿐임. eager일땐 항상 저만큼 연산이 일어남.
+        }
+    }
+
+    @Test
+    @Rollback
+    public void findMemberFetch(){
+        /*
+        * select member0_.member_id as member_i1_2_0_,
+        *  team1_.team_id as team_id1_4_1_,
+        * member0_.city as city2_2_0_,
+        * member0_.street as street3_2_0_,
+        *  member0_.zipcode as zipcode4_2_0_,
+        *  member0_.age as age5_2_0_,
+        * member0_.name as name6_2_0_,
+        * member0_.team_id as team_id7_2_0_,
+        * team1_.name as name2_4_1_
+        * from members member0_
+        * left outer join team team1_
+        *  on member0_.team_id=team1_.team_id
+        *  한번에 다 끌고 온다!*/
+        //given
+        //member1 -> teamA
+        //member2 -> teamB
+        Team teamA = new Team("teamA");
+        Team teamB = new Team("teamB");
+        teamRepository.save(teamA);
+        teamRepository.save(teamB);
+        Member member1 = new Member("hwang", 10 , teamA);
+        Member member2 = new Member("hwang2", 210 , teamB);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        em.flush();
+        em.clear();
+
+        //when
+        List<Member> members = memberRepository.findAll();
+        for(Member member : members){
+            System.out.println("member.getName() = " + member.getName()); //1번의 쿼리 리스트 가져올때
+            System.out.println("member.getTeam().getClass() = " + member.getTeam().getClass()); //프록시 가져옴(fetch = FetchType.lazy 이기 때문에
+            System.out.println("member.getTeam().getName() = " + member.getTeam().getName()); //n번의 쿼리
+            //팀을 가져오고 걔의 요소에 접근 할 때, 쿼리를 다시 돌려서 가져와야 됨.
+            //n+1은 lazy로 바꾼다고 해결되는게 아니라, 잠시 미룰 뿐임. eager일땐 항상 저만큼 연산이 일어남.
+        }
     }
 }

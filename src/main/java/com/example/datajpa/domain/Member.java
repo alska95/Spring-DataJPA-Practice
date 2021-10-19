@@ -18,6 +18,7 @@ import java.util.List;
         name = "Member.findByName",
         query = "select m from Member m where m.name =: name"
 )
+@NamedEntityGraph(name = "member.all", attributeNodes = @NamedAttributeNode("team"))
 public class Member {
     @Id @GeneratedValue
     @Column(name = "member_id")
@@ -31,9 +32,21 @@ public class Member {
     @OneToMany(mappedBy = "member")
     private List<Order> orders = new ArrayList<>();
 
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_id")
+    private Team team;
+
+    public Member(String name, int age, Team team){
+        this.name = name;
+        this.age = age;
+        this.team = team;
+    }
     public Member(String name){
         this.name = name;
     }
+
+
     public Member(String name, int age){
         this.name = name;
         this.age = age;

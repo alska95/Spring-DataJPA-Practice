@@ -4,6 +4,7 @@ import com.example.datajpa.domain.Member;
 import com.example.datajpa.dto.MemberDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -57,4 +58,17 @@ public interface MemberRepository extends JpaRepository<Member, Long> {//첫번�
     @Modifying(clearAutomatically = true) // clearAutomatically --> flush, clear자동으로 날려준다.
     @Query(value = "update members m set m.age = m.age +1 where m.age >= :age" , nativeQuery = true) //벌크 연산에서는 테이블 대상으로 쿼리를 날려야 한다.
     int bulkAgePlus(@Param("age") int age);
+
+    @Query("select m from Member m left join fetch m.team")
+    List<Member> getMemberByFetch();
+
+    @Override
+    @EntityGraph(attributePaths = ("team"))//jpql로 모두 fetchjoin해야 하는 수고를 덜어준다.
+    List<Member> findAll();
+
+
+//    @EntityGraph("member.all")
+    @EntityGraph(attributePaths = ("team"))
+    @Query("select m from Member m where m.name =:name")
+    List<Member> findByNameDefault(@Param("name") String name);
 }
