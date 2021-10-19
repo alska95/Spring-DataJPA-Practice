@@ -229,4 +229,36 @@ class MemberRepositoryTest {
             //n+1은 lazy로 바꾼다고 해결되는게 아니라, 잠시 미룰 뿐임. eager일땐 항상 저만큼 연산이 일어남.
         }
     }
+    @Test
+    public void queryHint(){
+        memberRepository.save(new Member("member1" , 10));
+        em.flush(); //쿼리는 날라가고, 영속성 컨텍스트는 유지된다.
+        em.clear(); //영속성 컨텍스트까지 날라간다.
+
+        Member findMember = memberRepository.findByName("member1").get(0);
+        findMember.setName("hwang"); //변경 감지로 commit시에 쿼리가 날라감. Dirtycheck등에 비용이 들어간다.
+        em.flush(); //
+
+        Member findOnlyMember = memberRepository.findReadOnlyByName("hwang");
+        findOnlyMember.setName("kyeong"); //변경감지 체크를 안한다. --> 효율적임.
+    }
+
+    @Test
+    public void lock(){
+        //given
+        Member member1 = new Member("member1" , 10);
+        memberRepository.save(member1);
+        em.flush();
+        em.clear();
+
+        Member member11 = memberRepository.findLockByName("member1");
+        /*
+        * select * from members member0_ where member0_.name=?
+        * for update
+        * db에서 락을 걸어버림.
+        * 대안으로 JPA에서 제공하는 @Version 같은 optimistic lock이 있음.
+        * */
+        member11.setName("hwang");
+        em.flush();
+    }
 }

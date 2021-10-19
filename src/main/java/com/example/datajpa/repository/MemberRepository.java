@@ -4,12 +4,11 @@ import com.example.datajpa.domain.Member;
 import com.example.datajpa.dto.MemberDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 
+import javax.persistence.LockModeType;
+import javax.persistence.QueryHint;
 import java.util.List;
 import java.util.Optional;
 
@@ -71,4 +70,13 @@ public interface MemberRepository extends JpaRepository<Member, Long> {//첫번�
     @EntityGraph(attributePaths = ("team"))
     @Query("select m from Member m where m.name =:name")
     List<Member> findByNameDefault(@Param("name") String name);
+
+    @QueryHints(value = @QueryHint( name = "org.hibernate.readOnly", value = "true"))
+    Member findReadOnlyByName(String name);
+
+
+    //select for update --> pessimistic lock
+    //@Version --> optimistic lock도 존재
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    Member findLockByName(String name);
 }
