@@ -32,13 +32,5 @@ public class Order {
     private LocalDateTime orderDate; //주문시간
 
     private OrderStatus status; //주문 상태 [ORDER / CANCEL]
-
-    public void setMember(Member member){
-        this.member = member;
-        member.getOrders().add(this);
-    }
-    public void setDelivery(Delivery delivery){
-        this.delivery = delivery;
-        delivery.setOrder(this);
-    }
+    
 }

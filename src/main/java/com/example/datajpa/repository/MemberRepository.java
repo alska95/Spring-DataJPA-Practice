@@ -2,6 +2,8 @@ package com.example.datajpa.repository;
 
 import com.example.datajpa.domain.Member;
 import com.example.datajpa.dto.MemberDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -46,4 +48,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {//첫번�
 
     @Query("select m from Member m where m.name in :names")
     Optional<Member> findOneByName(@Param("names") String names);
+
+
+//    @Query(value = "select m from Member m" , countQuery = "select count(m.name) from Member m") //count쿼리는 성능 이슈가 있을 수 있어서 따로 날릴 수 있다!
+    Page<Member> findByAge(int age, Pageable pageable);
 }
