@@ -266,4 +266,22 @@ class MemberRepositoryTest {
     public void callCustom(){
         List<Member> memberCustom = memberRepository.findMemberCustom();
     }
+    
+    @Test
+    public void JpaEventBaseEntity() throws Exception{
+        //given
+        Member member = new Member("member1");
+        memberRepository.save(member); //@PrePersist발 생
+        Thread.sleep(100);
+        member.setName("hwang");
+        em.flush();
+        em.clear();
+        //when
+        Member findMember = memberRepository.findByName("hwang").get(0);
+        //then
+        System.out.println("findMember.getCreatedDate = " + findMember.getCreatedDate());
+        System.out.println("findMember.getUpdateDate() = " + findMember.getLastModifiedDate());
+        System.out.println("findMember.getCreatedBy() = " + findMember.getCreatedBy());
+        System.out.println("findMember.getLastModifiedBy() = " + findMember.getLastModifiedBy());
+    }
 }

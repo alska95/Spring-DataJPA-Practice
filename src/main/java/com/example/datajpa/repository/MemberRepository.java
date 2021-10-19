@@ -30,6 +30,8 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
     *       이름 규칙을 맞춰줘야. Spring Data Jpa가 찾아서 호출 해준다.
     * 3. 사용하길 원하는 jpa 인터페이스에서 인터페이스를 상속받는다.
     *
+    *  Auditing
+    *  등록일 , 수정일 , 등록자, 수정자
     * */
 
     List<Member> findByNameAndAgeGreaterThan(String username, int age);
@@ -45,7 +47,7 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
     @Query("select m.name from Member m")
     List<String> findNameList();
 
-    @Query("select new com.example.datajpa.dto.MemberDto(m.id, m.name, o.name) from Member m join m.orders o")
+    @Query("select new com.example.datajpa.dto.MemberDto(m.id, m.name, t.name) from Member m join m.team t")
     List<MemberDto> findMemberDto();
 
     @Query("select m from Member m where m.name in :names")

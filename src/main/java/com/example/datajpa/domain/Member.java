@@ -4,6 +4,8 @@ package com.example.datajpa.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -12,25 +14,20 @@ import java.util.List;
 
 @Entity
 @Table(name = "members")
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NamedQuery(
         name = "Member.findByName",
         query = "select m from Member m where m.name =: name"
 )
 @NamedEntityGraph(name = "member.all", attributeNodes = @NamedAttributeNode("team"))
-public class Member {
+public class Member extends BaseEntity{
     @Id @GeneratedValue
     @Column(name = "member_id")
     private Long id;
     private String name;
-    @Embedded
-    private Address address;
     private int age;
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "member")
-    private List<Order> orders = new ArrayList<>();
 
 
     @ManyToOne(fetch = FetchType.LAZY)
