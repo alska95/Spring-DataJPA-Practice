@@ -12,7 +12,7 @@ import javax.persistence.QueryHint;
 import java.util.List;
 import java.util.Optional;
 
-public interface MemberRepository extends JpaRepository<Member, Long> {//첫번째 타입, 두번째 매핑된 pk
+public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom {//첫번째 타입, 두번째 매핑된 pk
 
     /*
     * JpaRepository<T , ID> 타입과 PK
@@ -24,6 +24,11 @@ public interface MemberRepository extends JpaRepository<Member, Long> {//첫번�
     *
     * Repository <- crudRepository <- pagingAndSortingRepository <- JpaRepository
     *
+    * 사용자 정의 인터페이스
+    * 1. 인터페이스 하나 만든다(이름은 자유)
+    * 2. 인터페이스 구현체를 만든다. 구현체의 이름은 사용하길 원하는 jpa인터페이스 이름 + Impl이다.
+    *       이름 규칙을 맞춰줘야. Spring Data Jpa가 찾아서 호출 해준다.
+    * 3. 사용하길 원하는 jpa 인터페이스에서 인터페이스를 상속받는다.
     *
     * */
 

@@ -261,4 +261,9 @@ class MemberRepositoryTest {
         member11.setName("hwang");
         em.flush();
     }
+
+    @Test
+    public void callCustom(){
+        List<Member> memberCustom = memberRepository.findMemberCustom();
+    }
 }
