@@ -5,6 +5,7 @@ import com.example.datajpa.dto.MemberDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -52,4 +53,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {//첫번�
 
 //    @Query(value = "select m from Member m" , countQuery = "select count(m.name) from Member m") //count쿼리는 성능 이슈가 있을 수 있어서 따로 날릴 수 있다!
     Page<Member> findByAge(int age, Pageable pageable);
+
+    @Modifying(clearAutomatically = true) // clearAutomatically --> flush, clear자동으로 날려준다.
+    @Query(value = "update members m set m.age = m.age +1 where m.age >= :age" , nativeQuery = true) //벌크 연산에서는 테이블 대상으로 쿼리를 날려야 한다.
+    int bulkAgePlus(@Param("age") int age);
 }

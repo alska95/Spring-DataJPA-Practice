@@ -11,13 +11,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.transaction.annotation.Transactional;
 
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Transactional
 @SpringBootTest
 class MemberRepositoryTest {
     
@@ -25,6 +29,9 @@ class MemberRepositoryTest {
     private MemberRepository memberRepository;
     @Autowired
     private MemberJpaRespository memberJpaRespository;
+
+    @PersistenceContext
+    private EntityManager em;
     @Test
     public void testMember(){
         
@@ -123,5 +130,27 @@ class MemberRepositoryTest {
 
 
         Assertions.assertThat(page.getPageSize()).isEqualTo(2);
+    }
+
+    @Test
+    public void bulkUpdate(){
+        //given
+        memberRepository.save(new Member("member1", 10));
+        memberRepository.save(new Member("member1", 20));
+        memberRepository.save(new Member("member3", 20));
+        memberRepository.save(new Member("member2", 30));
+        memberRepository.save(new Member("member2", 30));
+
+        em.flush(); //변경내용 반영
+        em.clear();
+
+        //when
+        int i = memberRepository.bulkAgePlus(29);
+
+        List<Member> member3 = memberRepository.findByName("member3");
+        System.out.println("member3 = " + member3.get(0).getAge()); //벌크 연산은 영속성 컨텍스트를 사용하지 않기때문에, member3에는 적용되지 않은 모습이다.
+        //then
+        System.out.println(i);
+
     }
 }

@@ -39,7 +39,7 @@ public class Member {
         this.age = age;
     }
 
-    protected Member(){
+    public Member(){
 
     } //스팩상 protected로 -->JPA구현체들이 객체를 만들어낼때 사용하기 위함.
 

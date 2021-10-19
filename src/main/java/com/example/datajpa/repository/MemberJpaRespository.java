@@ -12,14 +12,14 @@ public class MemberJpaRespository {
     @PersistenceContext
     private EntityManager em;
 
-    public Member save(Member member){
+    public void save(Member member){
         em.persist(member);
-        return member;
     }
 
     public Member find(Long id){
         return em.find(Member.class, id);
     }
+
 
     public List<Member> findByName(String name){
         return em.createNamedQuery("Member.findByName", Member.class)
@@ -39,5 +39,12 @@ public class MemberJpaRespository {
         return em.createQuery("select count(m) from Member m where m.name =:name ", Long.class)
                 .setParameter("name", name)
                 .getSingleResult();
+    }
+
+    public int bulkAgePlus(int age){
+        int resultCount = em.createQuery("update Member m set m.age = m.age +1 where m.age >= :age")
+                .setParameter("age", age)
+                .executeUpdate();
+        return resultCount;
     }
 }
