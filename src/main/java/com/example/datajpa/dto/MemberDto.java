@@ -9,4 +9,8 @@ public class MemberDto {
     private Long id;
     private String userMame;
     private String teamName;
+
+    public MemberDto(String name) {
+        this.userMame = name;
+    }
 }
