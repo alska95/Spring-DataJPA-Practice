@@ -42,7 +42,7 @@ public class MemberController {
     /*members?page=0&size=3&sort=id,desc 과 같이 요청한다
     * default pageSize는 20*/
 
-    @PostConstruct
+//    @PostConstruct
     public void init(){
         memberRepository.save(new Member("userA"));
         for(int i = 0 ; i < 100 ; i++){
