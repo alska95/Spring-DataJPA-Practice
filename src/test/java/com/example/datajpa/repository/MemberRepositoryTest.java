@@ -3,6 +3,7 @@ package com.example.datajpa.repository;
 import com.example.datajpa.domain.Member;
 import com.example.datajpa.domain.Team;
 import com.example.datajpa.repository.projection.ClosedProjections;
+import com.example.datajpa.repository.projection.MemberProjection;
 import com.example.datajpa.repository.projection.NameOnly;
 import org.assertj.core.api.Assertions;
 
@@ -333,4 +334,23 @@ class MemberRepositoryTest {
 //스프링DATAJPA가 알아서 인식해서 name만 필요함을 인지하고 해당하는 구현체를 구현해준다.
 
 
+    @Test
+    public void nativeQuery(){
+        Team teamA = new Team("teamA");
+        em.persist(teamA);
+
+        Member m1 = new Member("m1",0,teamA);
+        Member m2 = new Member("m2",0,teamA);
+        em.persist(m1);
+        em.persist(m2);
+
+        em.flush();
+        em.clear();
+        Member nativeQuery = memberRepository.findByNativeQuery("m1");
+        Page<MemberProjection> byNativeProjection = memberRepository.findByNativeProjection(PageRequest.of(0, 10));
+        for (MemberProjection memberProjection : byNativeProjection) {
+            System.out.println("memberProjection.getTeamName() = " + memberProjection.getTeamName());
+            System.out.println("memberProjection.getName() = " + memberProjection.getName());
+        }
+    }
 }

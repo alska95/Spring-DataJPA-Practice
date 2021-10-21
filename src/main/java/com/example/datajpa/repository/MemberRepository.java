@@ -2,6 +2,7 @@ package com.example.datajpa.repository;
 
 import com.example.datajpa.domain.Member;
 import com.example.datajpa.dto.MemberDto;
+import com.example.datajpa.repository.projection.MemberProjection;
 import com.example.datajpa.repository.projection.NameOnly;
 import com.example.datajpa.repository.projection.UsernameOnlyDto;
 import org.springframework.data.domain.Page;
@@ -96,4 +97,21 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
 
     //안에다가 원하는 타입 ex(usernameOnlyDto)같이 넣어주면 동적으로 projection이 가능하다.
     <T> List<T> findProjection3ByName(@Param("name") String name, Class<T> type);
+
+    @Query(value = "select * from members where name = ?", nativeQuery = true)
+    Member findByNativeQuery(String name);
+    /*
+    * 왠만하면 사용하지 말것..
+한계점이 많음, select 할 때 특정 애들을 전부 적어줘야 한다.
+문제는 반환타입이 몇가지 지정이 안된다. ex) username만 보고싶을 경우. --> mybatis 엮어서 쓰던지 하자.
+* sort 파라미터 작동하지 않을 수도 있다.
+* jpql처럼 로딩 시점에 쿼리를 확인 불가능하다.
+* 동적 쿼리가 불가능 하다.
+* projection을 활용하면 보완가능.
+* */
+    @Query(value = "select m.member_id as id, m.name , t.name as teamName " +
+            "from members m left join team t",
+            countQuery = "select count(*) from members"
+            , nativeQuery = true)
+    Page<MemberProjection> findByNativeProjection(Pageable pageable);
 }
