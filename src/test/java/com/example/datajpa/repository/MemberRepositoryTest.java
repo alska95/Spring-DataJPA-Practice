@@ -2,16 +2,14 @@ package com.example.datajpa.repository;
 
 import com.example.datajpa.domain.Member;
 import com.example.datajpa.domain.Team;
-import org.apache.logging.slf4j.SLF4JLogger;
+import com.example.datajpa.repository.projection.ClosedProjections;
+import com.example.datajpa.repository.projection.NameOnly;
 import org.assertj.core.api.Assertions;
+
 import org.junit.jupiter.api.Test;
-import org.junit.platform.commons.logging.Logger;
-import org.junit.platform.commons.logging.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,9 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
 @SpringBootTest
@@ -284,4 +279,58 @@ class MemberRepositoryTest {
         System.out.println("findMember.getCreatedBy() = " + findMember.getCreatedBy());
         System.out.println("findMember.getLastModifiedBy() = " + findMember.getLastModifiedBy());
     }
+
+    @Test
+    public void queryByExample(){
+
+        Team teamA = new Team("teamA");
+        em.persist(teamA);
+
+        Member m1 = new Member("m1",0,teamA);
+        Member m2 = new Member("m2",0,teamA);
+        em.persist(m1);
+        em.persist(m2);
+
+        em.flush();
+        em.clear();
+
+        Member member = new Member("m1");
+        member.setTeam(teamA); //inner join까진 가능.
+
+        ExampleMatcher matcher = ExampleMatcher.matching()
+                .withIgnorePaths("age");
+        Example<Member> example = Example.of(member, matcher);
+        List<Member> result = memberRepository.findAll(example);// QueryByExampleExecutor example 받아준다.
+
+
+    }
+
+    @Test
+    public void projections(){
+
+        Team teamA = new Team("teamA");
+        em.persist(teamA);
+
+        Member m1 = new Member("m1",0,teamA);
+        Member m2 = new Member("m2",0,teamA);
+        em.persist(m1);
+        em.persist(m2);
+
+        em.flush();
+        em.clear();
+
+        List<NameOnly> m11 = memberRepository.findProjectionByName("m1");
+        for (NameOnly nameOnly : m11) {
+            System.out.println("nameOnly = " + nameOnly);
+        }
+
+        List<ClosedProjections> closedResult = memberRepository.findProjection3ByName("m1", ClosedProjections.class);
+        for (ClosedProjections closedProjections : closedResult) {
+            System.out.println("closedProjections.getName() = " + closedProjections.getName());
+            System.out.println("closedProjections.getTeam() = " + closedProjections.getTeam());
+        }
+    }
+//스프링DATAJPA가 알아서 인식해서 name만 필요함을 인지하고 해당하는 구현체를 구현해준다.
+
+
 }

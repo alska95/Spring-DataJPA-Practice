@@ -2,6 +2,8 @@ package com.example.datajpa.repository;
 
 import com.example.datajpa.domain.Member;
 import com.example.datajpa.dto.MemberDto;
+import com.example.datajpa.repository.projection.NameOnly;
+import com.example.datajpa.repository.projection.UsernameOnlyDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
@@ -86,4 +88,12 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
     //@Version --> optimistic lock도 존재
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     Member findLockByName(String name);
+
+    List<NameOnly> findProjectionByName(@Param("name")String name);
+    //반환 타입에다가 내가 원하는 필드 넣으면 끝!
+
+    List<UsernameOnlyDto> findProjection2ByName(@Param("name") String name);
+
+    //안에다가 원하는 타입 ex(usernameOnlyDto)같이 넣어주면 동적으로 projection이 가능하다.
+    <T> List<T> findProjection3ByName(@Param("name") String name, Class<T> type);
 }
